@@ -47,6 +47,7 @@ nb-configuration.xml
 
 # Cursor IDE
 .cursor/
+.cursorrules
 
 # Logs
 *.log
