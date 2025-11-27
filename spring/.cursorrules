@@ -1,0 +1,37 @@
+- Do not be flattering or give compliments
+- All code and documentation must be generated in English only
+- Never insert comments in any generated files
+- Be critical, honest, concise and direct
+- Avoid verbose responses. Keep answers simple, direct, honest and critical
+- If you don't know the answer, say so clearly and ask what to do
+- Source code files in any language must never exceed 400 lines
+- Before creating something new, check if it already exists. Prioritize reuse
+- Do not generate any documentation files unless explicitly requested
+- Explanations to the user can be in Brazilian Portuguese
+- Always confirm with the user before modifying or generating anything. State what you intend to do for approval first
+- Focus 100% on what is requested. Do not add extra features
+- Always use Podman instead of Docker. Use podman-compose instead of docker-compose and Containerfile instead of Dockerfile
+
+## PROJECT CONTEXT
+
+### Objective
+Performance comparison demo: Spring Boot application vs Quarkus migration using Spring compatibility extensions.
+
+### Technology Stack
+- Spring Boot (baseline application)
+- Quarkus with Spring extensions (migrated version)
+- Keycloak for authentication/authorization
+
+### Core Spring Modules to Use
+- Spring Web: https://quarkus.io/guides/spring-web
+- Spring Data JPA: https://quarkus.io/guides/spring-data-jpa
+- Spring Security with Keycloak: https://quarkus.io/guides/spring-security
+
+### Key References
+- Quarkus for Spring developers: https://quarkus.io/spring/
+- Migration guide: https://medium.com/@murungarumungai/spring-boot-to-quarkus-migration-guide-52a7214b76f2
+- Real-world migration experience: https://blog.touret.info/2025/01/22/moving-from-spring-to-quarkus/
+- Testing best practices: https://dev.to/ankitdevcode/spring-boot-testing-a-comprehensive-best-practices-guide-1do6
+
+### Focus
+Demonstrate performance improvements when migrating from Spring Boot to Quarkus while maintaining Spring API compatibility.
