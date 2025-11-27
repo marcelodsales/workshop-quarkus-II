@@ -1,1 +1,1 @@
-#Workshop Quarkus II BBVA
+#Workshop Quarkus II
