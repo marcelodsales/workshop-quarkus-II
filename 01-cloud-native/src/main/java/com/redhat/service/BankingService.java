@@ -6,6 +6,7 @@ import com.redhat.model.Account;
 import com.redhat.model.Transaction;
 import com.redhat.model.TransactionType;
 import com.redhat.monitoring.TrackDataAccess;
+import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.DecimalMin;
@@ -21,7 +22,7 @@ import java.util.List;
 public class BankingService {
 
     public List<Account> getAllAccounts() {
-        return Account.findAll().list();
+        return Account.findAll(Sort.ascending("accountNumber")).list();
     }
 
     @Transactional

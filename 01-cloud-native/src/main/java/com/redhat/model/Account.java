@@ -38,7 +38,7 @@ public class Account extends PanacheEntityBase {
     private String ownerId;
 
     public boolean hasAvailableBalance(BigDecimal amount) {
-        return balance.compareTo(amount) < 0;
+        return balance.compareTo(amount) >= 0;
     }
 
     public Account createAccount(@NotEmpty String accountNumber, @NotEmpty String ownerId, @NotNull @PositiveOrZero BigDecimal initialBalance) {
