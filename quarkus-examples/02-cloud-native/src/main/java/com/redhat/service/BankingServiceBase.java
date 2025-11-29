@@ -8,7 +8,6 @@ import com.redhat.model.Transaction;
 import com.redhat.model.TransactionType;
 import com.redhat.repository.AccountRepository;
 import com.redhat.repository.TransactionRepository;
-import io.quarkus.arc.DefaultBean;
 import jakarta.data.Order;
 import jakarta.data.Sort;
 import jakarta.data.page.PageRequest;
@@ -26,7 +25,6 @@ import java.util.List;
 
 @Slf4j
 @ApplicationScoped
-@DefaultBean
 public class BankingServiceBase implements BankingService {
 
     @Inject

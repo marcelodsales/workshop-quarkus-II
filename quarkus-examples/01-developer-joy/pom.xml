@@ -10,10 +10,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.redhat</groupId>
-            <artifactId>quarkus-demo-common-panache</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-rest</artifactId>
         </dependency>
