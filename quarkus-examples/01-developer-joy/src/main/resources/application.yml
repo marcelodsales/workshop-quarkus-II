@@ -1,0 +1,36 @@
+quarkus:
+  application:
+    name: banking-demo
+    version: 1.0.0-SNAPSHOT
+  http:
+    port: 8080
+  jfr:
+    enabled: true
+  native:
+    monitoring: jfr
+  smallrye-openapi:
+    info-title: Banking API
+    info-version: 1.0.0
+    info-description: RESTful API for banking operations including account management, deposits, withdrawals, transfers, and transaction history
+
+"%dev":
+  quarkus:
+    hibernate-orm:
+      dev-ui:
+        allow-hql: true
+      metrics:
+        enabled: true
+    keycloak:
+      devservices:
+        realm-name: banking
+        port: 7171
+        users:
+          alice: alice
+          bob: bob
+          john: john
+          duke: duke
+        roles:
+          alice: admin,role1
+          bob: role2
+          john: role3
+          duke: role2

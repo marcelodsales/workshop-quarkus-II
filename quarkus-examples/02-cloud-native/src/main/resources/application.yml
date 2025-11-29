@@ -1,0 +1,35 @@
+quarkus:
+  application:
+    name: banking-demo
+    version: 1.0.0-SNAPSHOT
+  http:
+    port: 8080
+  smallrye-openapi:
+    info-title: Banking API
+    info-version: 1.0.0
+    info-description: RESTful API for banking operations including account management, deposits, withdrawals, transfers, and transaction history
+  devservices:
+    enabled: false
+  hibernate-orm:
+#    database:
+#      start-offline: true
+    schema-management:
+      strategy: drop-and-create
+  datasource:
+    db-kind: postgresql
+
+"%prod":
+  quarkus:
+    datasource:
+      username: ${banking}
+      password: ${banking}
+      jdbc:
+        url: jdbc:postgresql://postgres:5432/banking_db
+
+"%test":
+  quarkus:
+    devservices:
+      enabled: true
+
+greeting:
+  message: "hello"
