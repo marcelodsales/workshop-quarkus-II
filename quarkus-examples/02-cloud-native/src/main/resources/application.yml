@@ -11,22 +11,27 @@ quarkus:
   devservices:
     enabled: false
   hibernate-orm:
-#    database:
-#      start-offline: true
+    database:
+      start-offline: true
     schema-management:
-      strategy: drop-and-create
+#      strategy: drop-and-create
+      strategy: none
     log:
       sql: true
   datasource:
     db-kind: postgresql
+    username: banking
+    password: banking
+    jdbc:
+      url: jdbc:postgresql://localhost:5432/banking_db
 
-"%prod":
-  quarkus:
-    datasource:
-      username: ${banking}
-      password: ${banking}
-      jdbc:
-        url: jdbc:postgresql://postgres:5432/banking_db
+#"%prod":
+#  quarkus:
+#    datasource:
+#      username: ${banking}
+#      password: ${banking}
+#      jdbc:
+#        url: jdbc:postgresql://postgres:5432/banking_db
 
 "%test":
   quarkus:
