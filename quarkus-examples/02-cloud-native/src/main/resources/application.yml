@@ -2,8 +2,8 @@ quarkus:
   application:
     name: banking-demo
     version: 1.0.0-SNAPSHOT
-  http:
-    port: 8080
+#  http:
+#    port: 8080
   smallrye-openapi:
     info-title: Banking API
     info-version: 1.0.0
@@ -24,9 +24,9 @@ quarkus:
     password: ${database-password:banking}
     jdbc:
       url: jdbc:postgresql://${database-host:localhost}:5432/${database-name:banking_db}
-  native:
-    container-build: true
-    container-runtime: podman
+#  native:
+#    container-build: true
+#    container-runtime: podman
   openshift:
     route:
       expose: true
@@ -35,6 +35,14 @@ quarkus:
       configmaps: banking-config
     build-strategy: docker
     native-dockerfile: src/main/docker/Dockerfile.native-micro
+  swagger-ui:
+    always-include: true
+
+"%prod":
+  quarkus:
+    swagger-ui:
+      enabled: true
+      path: docs
 
 #"%prod":
 #  quarkus:
