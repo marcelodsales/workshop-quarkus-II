@@ -1,4 +1,6 @@
 -- Banking Database Schema
+-- Grant Permissions to SCHEMA if needed: GRANT ALL ON SCHEMA public TO banking;
+-- Grant Permissions to DATABASE if needed: GRANT ALL PRIVILEGES ON DATABASE banking_db TO banking;
 
 -- Create sequence for transactions
 CREATE SEQUENCE IF NOT EXISTS transaction_id_seq

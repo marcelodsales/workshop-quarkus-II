@@ -1,5 +1,6 @@
 package com.redhat.rest;
 
+import com.redhat.config.BankingConfig;
 import com.redhat.model.Account;
 import com.redhat.rest.dto.AccountRequest;
 import com.redhat.rest.dto.TransactionResponse;
@@ -33,6 +34,9 @@ public class BankingRestResource {
 
     @Inject
     protected BankingService bankingService;
+
+    @Inject
+    BankingConfig bankingConfig;
 
     @POST
     @Path("/accounts")
@@ -139,6 +143,18 @@ public class BankingRestResource {
             @PathParam("accountNumber") String accountNumber) {
         List<TransactionResponse> transactions = bankingService.getTransactions(accountNumber).stream().map((t) -> new TransactionResponse(t.getTransactionId(), t.getAccountNumber(), t.getType().name(), t.getAmount(), t.getTimestamp(), t.getDescription())).toList();
         return Response.ok(transactions).build();
+    }
+
+    @GET
+    @Path("/config")
+    @Produces(MediaType.TEXT_PLAIN)
+    @Operation(summary = "Get configuration", description = "Retrieves configuration values from environment variables or Kubernetes/OpenShift cluster")
+    @APIResponse(responseCode = "200", description = "Configuration retrieved successfully",
+            content = @Content(schema = @Schema(implementation = String.class),
+                    examples = {@ExampleObject(name = "ConfigMessage", summary = "Configuration message", value = "Banking Title: Banking Quarkus")}))
+    public Response config() {
+        String message = "Banking Title: " + bankingConfig.title();
+        return Response.ok(message).build();
     }
 
 }

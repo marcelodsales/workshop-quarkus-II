@@ -20,13 +20,30 @@ quarkus:
       sql: true
   datasource:
     db-kind: postgresql
-    username: banking
-    password: banking
+    username: ${database-user:banking}
+    password: ${database-password:banking}
     jdbc:
-      url: jdbc:postgresql://localhost:5432/banking_db
+      url: jdbc:postgresql://${database-host:localhost}:5432/${database-name:banking_db}
+  native:
+    container-build: true
+    container-runtime: podman
+  openshift:
+    route:
+      expose: true
+    env:
+      secrets: postgresql-secret
+      configmaps: banking-config
+    build-strategy: docker
+    native-dockerfile: src/main/docker/Dockerfile.native-micro
 
 #"%prod":
 #  quarkus:
+#    openshift:
+#      route:
+#        expose: true
+#      env:
+#        secrets: postgresql-secret
+#        configmaps: banking-config
 #    datasource:
 #      username: ${banking}
 #      password: ${banking}
@@ -37,6 +54,11 @@ quarkus:
   quarkus:
     devservices:
       enabled: true
+    hibernate-orm:
+      database:
+        start-offline: true
+      schema-management:
+        strategy: drop-and-create
 
-greeting:
-  message: "hello"
+banking:
+  title: ${BANKING_TITLE:Banking Quarkus}
