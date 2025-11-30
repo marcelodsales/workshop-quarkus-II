@@ -1,6 +1,15 @@
 -- Banking Database Schema
 -- Grant Permissions to SCHEMA if needed: GRANT ALL ON SCHEMA public TO banking;
 -- Grant Permissions to DATABASE if needed: GRANT ALL PRIVILEGES ON DATABASE banking_db TO banking;
+--- postgresql pod:
+---     \c banking_db
+---     GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO banking;
+---     GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO banking;
+
+--- OR Update default permissions (expands to future db objects)
+--- ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO banking;
+--- ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO banking;
+
 
 -- Create sequence for transactions
 CREATE SEQUENCE IF NOT EXISTS transaction_id_seq

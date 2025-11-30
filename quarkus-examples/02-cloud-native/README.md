@@ -87,3 +87,18 @@ Create your first JPA entity
 Easily start your REST Web Services
 
 [Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
+
+### Openshift Deploy
+
+```shell
+./mvnw clean package -DskipTests -Pnative -Dquarkus.openshift.deploy=true
+```
+
+**** NOTES ****
+já gerei imagem nativa.
+agora demonstro como rodar local, colocar em um container com podman build
+o build nativo está sendo gerado com a graalvm de minha máquina. para gerar com containers basta descomentar no applicaction.yaml os valores de native.build.
+
+Falta com um comando ordenar deploy no openshift. a configuração a principio deve usar o build nativo para gerar container menor.
+
+Para a app cloud native 

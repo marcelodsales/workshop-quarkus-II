@@ -15,7 +15,14 @@
 # Then run the container using:
 #
 # podman run --rm --name quarkus-demo -p 8080:8080 marcelodsales/quarkus-demo
-# podman run --rm --memory 64m --name quarkus-demo -p 8080:8080 marcelodsales/quarkus-demo
+#
+# podman run --rm --memory 64m \
+# --name quarkus-demo \
+# -p 8080:8080 \
+# -e database-host=banking-postgres \
+# --network banking-network \
+# marcelodsales/quarkus-demo
+#
 # podman stats --no-stream
 #
 #

@@ -24,6 +24,8 @@ kind: StatefulSet
 apiVersion: apps/v1
 metadata:
   name: postgresql
+  labels:
+    app.kubernetes.io/part-of: banking-demo
 spec:
   serviceName: postgresql
   selector:

@@ -30,11 +30,19 @@ quarkus:
   openshift:
     route:
       expose: true
+      target-port: http
+      tls:
+        termination: edge
+        insecure-edge-termination-policy: Redirect
     env:
       secrets: postgresql-secret
       configmaps: banking-config
     build-strategy: docker
     native-dockerfile: src/main/docker/Dockerfile.native-micro
+    annotations:
+      app.openshift.io/connects-to: '[{"apiVersion":"apps/v1","kind":"StatefulSet","name":"postgresql"}]'
+    labels:
+      app.kubernetes.io/part-of: banking-demo
   swagger-ui:
     always-include: true
 
