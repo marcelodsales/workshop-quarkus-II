@@ -31,6 +31,10 @@ spec:
                 name: postgresql-secret
             - configMapRef:
                 name: banking-config
+          volumeMounts:
+            - name: large-files
+              mountPath: /app/data
+              readOnly: true
           readinessProbe:
             httpGet:
               path: /q/health/ready
@@ -59,3 +63,8 @@ spec:
             limits:
               memory: "256Mi"
               cpu: "500m"
+      volumes:
+        - name: large-files
+          persistentVolumeClaim:
+            claimName: large-files-data
+            readOnly: true

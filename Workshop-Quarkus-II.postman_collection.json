@@ -1555,6 +1555,118 @@
 			]
 		},
 		{
+			"name": "Data Loading",
+			"item": [
+				{
+					"name": "Read Data Traditional (Blocking)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has correct content type\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+									"});",
+									"",
+									"pm.test(\"Response has accounts and transactions\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property(\"accounts\");",
+									"    pm.expect(jsonData).to.have.property(\"transactions\");",
+									"    pm.expect(jsonData.accounts).to.be.an('array');",
+									"    pm.expect(jsonData.transactions).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"Response has custom headers\", function () {",
+									"    pm.expect(pm.response.headers.get(\"X-Read-Time-Ms\")).to.exist;",
+									"    pm.expect(pm.response.headers.get(\"X-Accounts-Count\")).to.exist;",
+									"    pm.expect(pm.response.headers.get(\"X-Transactions-Count\")).to.exist;",
+									"    pm.expect(pm.response.headers.get(\"X-Read-Mode\")).to.equal(\"BLOCKING\");",
+									"});",
+									"",
+									"console.log(\"Read time: \" + pm.response.headers.get(\"X-Read-Time-Ms\") + \"ms\");",
+									"console.log(\"Accounts: \" + pm.response.headers.get(\"X-Accounts-Count\"));",
+									"console.log(\"Transactions: \" + pm.response.headers.get(\"X-Transactions-Count\"));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/data/read-traditional",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"data",
+								"read-traditional"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Read Data Reactive (Streaming)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has correct content type\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+									"});",
+									"",
+									"pm.test(\"Response is an array of data items\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"    pm.expect(jsonData.length).to.be.above(0);",
+									"});",
+									"",
+									"pm.test(\"Data items have required fields\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var firstItem = jsonData[0];",
+									"    pm.expect(firstItem).to.have.property(\"accountNumber\");",
+									"});",
+									"",
+									"console.log(\"Total items received: \" + pm.response.json().length);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/data/read-reactive",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"data",
+								"read-reactive"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Configuration",
 			"item": [
 				{
