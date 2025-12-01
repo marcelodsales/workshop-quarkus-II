@@ -2,6 +2,20 @@
 
 Running Spring applications on Quarkus to optimize for cloud-native environments.
 
+## Automated Execution
+
+To run the entire demo automatically and see performance comparison results:
+
+```bash
+./scripts/demo-run.sh
+```
+
+This script executes all steps below, measures performance metrics, and displays Quarkus optimization gains under realistic resource constraints (256MB RAM, 1 CPU core).
+
+For a detailed walkthrough and manual execution, follow the steps below.
+
+---
+
 ## 0. Prerequisites
 
 Start PostgreSQL:
@@ -217,9 +231,9 @@ podman stats --no-stream quarkus-banking
 podman stop quarkus-banking
 ```
 
-## 4. Performance Comparison
+## 4. Performance Analysis
 
-### 4.1 Startup Time Comparison
+### 4.1 Startup Time
 
 #### 4.1.1 Spring Boot startup
 ```bash
@@ -236,7 +250,7 @@ grep "started in" quarkus.log
 podman images | grep "banking"
 ```
 
-### 4.3 Container Resource Consumption
+### 4.3 Container Resource Usage
 
 #### 4.3.1 Spring Boot container metrics
 ```bash
@@ -341,30 +355,28 @@ podman stats --no-stream quarkus-banking
 podman stop quarkus-banking
 ```
 
-#### 4.4.4 Compare Results
+#### 4.4.4 Analyze Results
 
 Review the Apache Bench outputs from both tests:
 
-**Key metrics to compare:**
-- **Requests per second**: Overall throughput capacity
-- **Time per request (mean)**: Average latency per request
-- **Failed requests**: Should be 0 for both
+**Key metrics:**
+- **Requests per second**: Throughput capacity
+- **Time per request (mean)**: Average latency
+- **Failed requests**: Should be 0
 - **Memory before/after load**: Memory growth under stress
 - **CPU usage**: Processing efficiency
 
-Both frameworks should show similar throughput with Quarkus typically having slightly lower memory consumption under load.
-
-**Resource Constraints Impact:**
+**Quarkus Optimization Under Resource Constraints:**
 
 Containers run with realistic cloud-native limits (256MB RAM, 1 CPU core) to simulate production environments where resources are controlled via quotas and limit ranges.
 
-Under these constraints, Quarkus demonstrates significant advantages:
-- **Higher throughput** (~42% more requests/second)
-- **Lower latency** (~30% faster response times)
-- **Better memory efficiency** (24% less RAM usage)
-- **Lower CPU utilization** (15% less CPU consumption)
+Under these constraints, Quarkus delivers:
+- **42% higher throughput** 
+- **30% lower latency**
+- **24% less memory usage**
+- **15% lower CPU consumption**
 
-This validates Quarkus's optimization for containerized, resource-constrained environments typical of Kubernetes deployments where every MB and CPU cycle directly impacts costs and density.
+This demonstrates Quarkus's optimization for containerized, resource-constrained environments typical of Kubernetes deployments where every MB and CPU cycle directly impacts costs and deployment density.
 
 ## 5. Cleanup
 
@@ -401,24 +413,24 @@ Native mode provides extreme optimization for serverless and edge deployments.
 
 ## 7. Quick Reference
 
-### Results Summary (from this demo)
+### Quarkus Optimization Gains
 
 **JVM Process (idle, post-GC):**
-| Metric | Spring Boot | Quarkus JVM | Improvement |
-|--------|-------------|-------------|-------------|
+| Metric | Spring Boot | Quarkus JVM | Gain |
+|--------|-------------|-------------|------|
 | Startup Time | 2.5s | 1.6s | **1.6x faster** |
-| RSS Memory | 281 MB | 238 MB | **15.4% less** |
-| Heap Used | 22 MB | 14 MB | **36.1% less** |
-| Image Size | 431 MB | 427 MB | **1% less** |
+| RSS Memory | 281 MB | 238 MB | **15.4% reduction** |
+| Heap Used | 22 MB | 14 MB | **36.1% reduction** |
+| Image Size | 431 MB | 427 MB | **1% smaller** |
 
 **Container (256MB RAM, 1 CPU limit, under load):**
-| Metric | Spring Boot | Quarkus JVM | Improvement |
-|--------|-------------|-------------|-------------|
-| Memory Usage | 212 MB | 160 MB | **24.1% less** |
-| CPU Usage | 70.8% | 59.8% | **15.5% less** |
-| Throughput | 768 req/s | 1092 req/s | **42.1% faster** |
-| Latency (mean) | 65 ms | 46 ms | **29.6% lower** |
+| Metric | Spring Boot | Quarkus JVM | Gain |
+|--------|-------------|-------------|------|
+| Memory Usage | 212 MB | 160 MB | **24.1% reduction** |
+| CPU Usage | 70.8% | 59.8% | **15.5% reduction** |
+| Throughput | 768 req/s | 1092 req/s | **42.1% increase** |
+| Latency (mean) | 65 ms | 46 ms | **29.6% reduction** |
 | **Code Changes** | - | **None** | Same Spring APIs |
 
-**Key insight**: Quarkus delivers substantial performance gains under realistic resource constraints (256MB RAM, 1 CPU) typical of production Kubernetes environments. With zero code changes to Spring APIs, applications gain 42% more throughput while consuming 24% less memory—directly reducing cloud costs and increasing deployment density.
+**Migration benefit**: Quarkus delivers substantial resource efficiency gains under realistic constraints (256MB RAM, 1 CPU) typical of production Kubernetes environments. With zero code changes to Spring APIs, applications achieve 42% higher throughput while consuming 24% less memory—directly reducing cloud costs and increasing deployment density.
 
