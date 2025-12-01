@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  postgres-banking:
+    image: docker.io/library/postgres:17
+    container_name: banking-postgres
+    environment:
+      POSTGRES_DB: banking
+      POSTGRES_USER: banking
+      POSTGRES_PASSWORD: banking
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-banking-data:/var/lib/postgresql/data  
+
+volumes:
+  postgres-banking-data:  
+

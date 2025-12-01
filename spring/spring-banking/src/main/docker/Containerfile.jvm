@@ -1,0 +1,34 @@
+####
+# This Containerfile is used to build a container that runs the Spring Boot application in JVM mode
+#
+# Before building the container image run:
+#
+# ./mvnw package
+#
+# Then, build the image with:
+#
+# podman build -f src/main/docker/Containerfile.jvm -t spring-banking:latest .
+#
+# Then run the container using:
+#
+# podman run -i --rm -p 8080:8080 spring-banking:latest
+#
+# If you want to include the debug port into your container image
+# you will have to expose the debug port (default 5005) like this: EXPOSE 8080 5005
+# Additionally you will have to set -e JAVA_TOOL_OPTIONS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+# when running the container
+#
+###
+FROM registry.access.redhat.com/ubi9/openjdk-21-runtime:1.23
+
+ENV LANGUAGE='en_US:en'
+
+COPY --chown=185 target/*.jar /deployments/app.jar
+
+EXPOSE 8080
+USER 185
+
+ENV JAVA_OPTS="-Dspring.profiles.active=prod -Djava.security.egd=file:/dev/./urandom"
+
+ENTRYPOINT ["java", "-jar", "/deployments/app.jar"]
+
