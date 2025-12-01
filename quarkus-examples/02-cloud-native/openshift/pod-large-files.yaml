@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-large-files
+spec:
+  volumes:
+    - name: large-files-volume-rwx
+      persistentVolumeClaim:
+        claimName: large-files-data
+  containers:
+    - name: transfer-pod
+      image: registry.access.redhat.com/ubi9/ubi:latest
+      command: ["/bin/bash", "-c", "sleep infinity"]
+      volumeMounts:
+        - mountPath: "/mnt/large-files"
+          name: large-files-volume-rwx

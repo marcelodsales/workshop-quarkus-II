@@ -77,3 +77,6 @@ replay_pid*
 *.jfr
 
 quarkus-demo.zip
+
+# Ignore large test data files (16MB+)
+**/data-load-x*.json

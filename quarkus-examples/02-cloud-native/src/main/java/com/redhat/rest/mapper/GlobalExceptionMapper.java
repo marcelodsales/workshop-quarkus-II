@@ -17,7 +17,10 @@ import jakarta.ws.rs.ext.Provider;
 
 import java.time.LocalDateTime;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Provider
+@Slf4j
 public class GlobalExceptionMapper implements ExceptionMapper<Exception> {
 
     @Context
@@ -118,6 +121,8 @@ public class GlobalExceptionMapper implements ExceptionMapper<Exception> {
                     .build();
         }
         
+log.error("Error: {}", exception.getMessage());
+
         return ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())

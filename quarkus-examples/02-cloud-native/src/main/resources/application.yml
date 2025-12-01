@@ -43,6 +43,12 @@ quarkus:
       app.openshift.io/connects-to: '[{"apiVersion":"apps/v1","kind":"StatefulSet","name":"postgresql"}]'
     labels:
       app.kubernetes.io/part-of: banking-demo
+    pvc-volumes:
+      large-files:
+        claim-name: large-files-data
+    mounts:
+      large-files:
+        path: /app/data
   swagger-ui:
     always-include: true
 
@@ -81,3 +87,4 @@ quarkus:
 
 banking:
   title: ${BANKING_TITLE:Banking Quarkus}
+  data-load-example: ${DATA_LOAD_EXAMPLE:data-load-example.json}

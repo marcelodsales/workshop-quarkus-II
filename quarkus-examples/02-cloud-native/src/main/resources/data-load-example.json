@@ -1,0 +1,20 @@
+{
+  "accounts": [
+    {"accountNumber": "ACC10001", "ownerId": "OWNER001", "balance": 5000.00},
+    {"accountNumber": "ACC10002", "ownerId": "OWNER002", "balance": 15000.00},
+    {"accountNumber": "ACC10003", "ownerId": "OWNER003", "balance": 8500.50},
+    {"accountNumber": "ACC10004", "ownerId": "OWNER004", "balance": 22000.00},
+    {"accountNumber": "ACC10005", "ownerId": "OWNER005", "balance": 3200.75}
+  ],
+  "transactions": [
+    {"accountNumber": "ACC10001", "type": "DEPOSIT", "amount": 1000.00, "description": "Initial deposit"},
+    {"accountNumber": "ACC10001", "type": "WITHDRAW", "amount": 200.00, "description": "ATM withdrawal"},
+    {"accountNumber": "ACC10002", "type": "DEPOSIT", "amount": 5000.00, "description": "Salary payment"},
+    {"accountNumber": "ACC10002", "type": "WITHDRAW", "amount": 150.00, "description": "Online purchase"},
+    {"accountNumber": "ACC10003", "type": "DEPOSIT", "amount": 2500.50, "description": "Freelance payment"},
+    {"accountNumber": "ACC10004", "type": "DEPOSIT", "amount": 10000.00, "description": "Business transfer"},
+    {"accountNumber": "ACC10004", "type": "WITHDRAW", "amount": 3000.00, "description": "Rent payment"},
+    {"accountNumber": "ACC10005", "type": "DEPOSIT", "amount": 1200.75, "description": "Refund"}
+  ]
+}
+

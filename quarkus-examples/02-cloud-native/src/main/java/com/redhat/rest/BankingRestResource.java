@@ -7,6 +7,7 @@ import com.redhat.rest.dto.TransactionResponse;
 import com.redhat.rest.dto.TransferRequest;
 import com.redhat.service.BankingService;
 import io.smallrye.common.annotation.NonBlocking;
+import io.smallrye.mutiny.infrastructure.Infrastructure;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
@@ -23,7 +24,22 @@ import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
+import io.smallrye.mutiny.Multi;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.redhat.rest.dto.AccountData;
+import com.redhat.rest.dto.DataItem;
+import com.redhat.rest.dto.DataLoadResponse;
+import com.redhat.rest.dto.TransactionData;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Path("/api")
@@ -157,6 +173,105 @@ public class BankingRestResource {
     public Response config() {
         String message = "Banking Title: " + bankingConfig.title();
         return Response.ok(message).build();
+    }
+
+    @GET
+    @Path("/data/read-traditional")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Read file traditionally", 
+               description = "Reads entire file into memory, deserializes all objects at once (blocking I/O)")
+    @APIResponse(responseCode = "200", description = "File read successfully")
+    @APIResponse(responseCode = "500", description = "Read failed")
+    public Response readFileTraditional() {
+        try {
+            long startTime = System.currentTimeMillis();
+            String filePath = bankingConfig.dataLoadExample();
+            
+            String jsonContent;
+            java.nio.file.Path path = Paths.get(filePath);
+            
+            if (Files.exists(path)) {
+                jsonContent = Files.readString(path, StandardCharsets.UTF_8);
+            } else {
+                try (InputStream is = getClass().getClassLoader().getResourceAsStream(filePath)) {
+                    if (is == null) {
+                        return Response.status(Response.Status.NOT_FOUND)
+                                .entity("File not found: " + filePath)
+                                .build();
+                    }
+                    jsonContent = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+                }
+            }
+            
+            ObjectMapper mapper = new ObjectMapper();
+            DataLoadResponse data = mapper.readValue(jsonContent, DataLoadResponse.class);
+            
+            long duration = System.currentTimeMillis() - startTime;
+            
+            return Response.ok(data)
+                    .header("X-Read-Time-Ms", duration)
+                    .header("X-Accounts-Count", data.accounts().size())
+                    .header("X-Transactions-Count", data.transactions().size())
+                    .header("X-Read-Mode", "BLOCKING")
+                    .build();
+        } catch (Exception e) {
+            log.error("Error reading file", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Read failed: " + e.getMessage())
+                    .build();
+        }
+    }
+
+    @GET
+    @Path("/data/read-reactive")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Read data reactively",
+            description = "Streams all accounts then transactions incrementally using streaming parser")
+    public Multi<DataItem> readDataReactive() {
+        Multi<DataItem> accounts = streamJsonArray("accounts", AccountData.class).map(a -> (DataItem) a);
+        Multi<DataItem> transactions = streamJsonArray("transactions", TransactionData.class).map(t -> (DataItem) t);
+        
+        return Multi.createBy().concatenating().streams(accounts, transactions);
+    }
+
+    private <T> Multi<T> streamJsonArray(String fieldName, Class<T> targetClass) {
+        String filePath = bankingConfig.dataLoadExample();
+
+        return Multi.createFrom().<T>emitter(emitter -> {
+            try {
+                java.nio.file.Path path = Paths.get(filePath);
+                InputStream inputStream = Files.exists(path)
+                        ? new FileInputStream(path.toFile())
+                        : getClass().getClassLoader().getResourceAsStream(filePath);
+
+                if (inputStream == null) {
+                    emitter.fail(new IOException("File not found: " + filePath));
+                    return;
+                }
+
+                ObjectMapper mapper = new ObjectMapper();
+                try (JsonParser parser = mapper.getFactory().createParser(inputStream)) {
+                    while (parser.nextToken() != null) {
+                        if (parser.getCurrentToken() == JsonToken.FIELD_NAME && fieldName.equals(parser.currentName())) {
+                            parser.nextToken();
+
+                            while (parser.nextToken() != JsonToken.END_ARRAY) {
+                                if (emitter.isCancelled()) {
+                                    return;
+                                }
+                                T item = parser.readValueAs(targetClass);
+                                emitter.emit(item);
+                            }
+                            break;
+                        }
+                    }
+                    emitter.complete();
+                }
+            } catch (Exception e) {
+                log.error("Error streaming {}", fieldName, e);
+                emitter.fail(e);
+            }
+        }).runSubscriptionOn(Infrastructure.getDefaultWorkerPool());
     }
 
 }

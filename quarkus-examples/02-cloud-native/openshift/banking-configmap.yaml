@@ -1,6 +1,7 @@
 apiVersion: v1
 data:
   BANKING_TITLE: Quarkus Banking from Configmap
+  DATA_LOAD_EXAMPLE: /app/data/data-load-xlarge.json
 kind: ConfigMap
 metadata:
   name: banking-config

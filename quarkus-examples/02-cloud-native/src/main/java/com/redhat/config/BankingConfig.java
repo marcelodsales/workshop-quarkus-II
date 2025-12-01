@@ -8,4 +8,7 @@ public interface BankingConfig {
 
     @WithName("title")
     String title();
+    
+    @WithName("data-load-example")
+    String dataLoadExample();
 }
