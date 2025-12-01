@@ -94,11 +94,9 @@ Easily start your REST Web Services
 ./mvnw clean package -DskipTests -Pnative -Dquarkus.openshift.deploy=true
 ```
 
+### Undeploy
+```shell
+oc delete -f target/kubernetes/openshift.yml
+```
+
 **** NOTES ****
-já gerei imagem nativa.
-agora demonstro como rodar local, colocar em um container com podman build
-o build nativo está sendo gerado com a graalvm de minha máquina. para gerar com containers basta descomentar no applicaction.yaml os valores de native.build.
-
-Falta com um comando ordenar deploy no openshift. a configuração a principio deve usar o build nativo para gerar container menor.
-
-Para a app cloud native 

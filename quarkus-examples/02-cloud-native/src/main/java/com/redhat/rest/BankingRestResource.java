@@ -6,6 +6,7 @@ import com.redhat.rest.dto.AccountRequest;
 import com.redhat.rest.dto.TransactionResponse;
 import com.redhat.rest.dto.TransferRequest;
 import com.redhat.service.BankingService;
+import io.smallrye.common.annotation.NonBlocking;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
@@ -152,6 +153,7 @@ public class BankingRestResource {
     @APIResponse(responseCode = "200", description = "Configuration retrieved successfully",
             content = @Content(schema = @Schema(implementation = String.class),
                     examples = {@ExampleObject(name = "ConfigMessage", summary = "Configuration message", value = "Banking Title: Banking Quarkus")}))
+    @NonBlocking
     public Response config() {
         String message = "Banking Title: " + bankingConfig.title();
         return Response.ok(message).build();
