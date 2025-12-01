@@ -51,6 +51,9 @@ quarkus:
     swagger-ui:
       enabled: true
       path: docs
+    hibernate-orm:
+      log:
+        sql: false
 
 #"%prod":
 #  quarkus:
