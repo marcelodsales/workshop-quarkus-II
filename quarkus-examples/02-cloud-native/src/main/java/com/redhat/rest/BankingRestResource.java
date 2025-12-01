@@ -37,7 +37,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -187,25 +186,44 @@ public class BankingRestResource {
             long startTime = System.currentTimeMillis();
             String filePath = bankingConfig.dataLoadExample();
             
-            String jsonContent;
             java.nio.file.Path path = Paths.get(filePath);
+            InputStream inputStream;
             
             if (Files.exists(path)) {
-                jsonContent = Files.readString(path, StandardCharsets.UTF_8);
+                inputStream = new FileInputStream(path.toFile());
             } else {
-                try (InputStream is = getClass().getClassLoader().getResourceAsStream(filePath)) {
-                    if (is == null) {
-                        return Response.status(Response.Status.NOT_FOUND)
-                                .entity("File not found: " + filePath)
-                                .build();
-                    }
-                    jsonContent = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+                inputStream = getClass().getClassLoader().getResourceAsStream(filePath);
+                if (inputStream == null) {
+                    return Response.status(Response.Status.NOT_FOUND)
+                            .entity("File not found: " + filePath)
+                            .build();
                 }
             }
             
-            ObjectMapper mapper = new ObjectMapper();
-            DataLoadResponse data = mapper.readValue(jsonContent, DataLoadResponse.class);
+            List<AccountData> accounts = new java.util.ArrayList<>();
+            List<TransactionData> transactions = new java.util.ArrayList<>();
             
+            ObjectMapper mapper = new ObjectMapper();
+            try (JsonParser parser = mapper.getFactory().createParser(inputStream)) {
+                while (parser.nextToken() != null) {
+                    if (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
+                        String fieldName = parser.currentName();
+                        parser.nextToken();
+                        
+                        if ("accounts".equals(fieldName)) {
+                            while (parser.nextToken() != JsonToken.END_ARRAY) {
+                                accounts.add(parser.readValueAs(AccountData.class));
+                            }
+                        } else if ("transactions".equals(fieldName)) {
+                            while (parser.nextToken() != JsonToken.END_ARRAY) {
+                                transactions.add(parser.readValueAs(TransactionData.class));
+                            }
+                        }
+                    }
+                }
+            }
+            
+            DataLoadResponse data = new DataLoadResponse(accounts, transactions);
             long duration = System.currentTimeMillis() - startTime;
             
             return Response.ok(data)
