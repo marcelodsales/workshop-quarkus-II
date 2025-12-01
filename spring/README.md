@@ -9,9 +9,16 @@ Start PostgreSQL:
 podman-compose up -d
 ```
 
+Ensure JDK command-line tools are available (used to read heap metrics):
+```bash
+command -v jcmd
+```
+
+**Note:** All container tests use realistic resource limits (256MB RAM, 1 CPU core) to simulate production Kubernetes environments with resource quotas.
+
 ## 1. Spring Boot Application
 
-Standard Spring Boot banking application with JPA, REST, and actuator.
+Standard Spring Boot banking application with JPA and REST.
 
 ### 1.1 Build Spring Boot application
 ```bash
@@ -33,7 +40,7 @@ echo "Spring Boot PID: $SPRING_PID"
 Wait 10 seconds for startup, then measure:
 ```bash
 ps -p $SPRING_PID -o rss= | awk '{print "RSS Memory: " $1/1024 " MB"}'
-curl -s http://localhost:8080/actuator/metrics/jvm.memory.used | grep -o '"value":[0-9.E+]*' | head -1 | awk -F: '{printf "Heap Used: %.2f MB\n", $2/1048576}'
+jcmd $SPRING_PID GC.heap_info | awk '/garbage-first heap/ {gsub(/K/, "", $9); printf "Heap Used: %.2f MB\n", $9/1024}'
 ```
 
 ### 1.3 Test the application
@@ -70,6 +77,7 @@ kill $SPRING_PID
 sleep 3
 
 podman run -d --rm --name spring-banking \
+  --memory 256m --cpus 1 \
   -p 8080:8080 \
   -e SPRING_DATASOURCE_URL=jdbc:postgresql://host.containers.internal:5432/banking \
   spring-banking:latest
@@ -104,7 +112,7 @@ Spring Boot → Quarkus
 spring-boot-starter-web         → quarkus-spring-web
 spring-boot-starter-data-jpa    → quarkus-spring-data-jpa
 spring-boot-starter-validation  → quarkus-hibernate-validator
-spring-boot-starter-actuator    → quarkus-smallrye-health
+spring-boot-starter-actuator    → removed (heap measured via jcmd; health handled by Quarkus SmallRye Health)
 EOF
 ```
 
@@ -195,6 +203,7 @@ kill $QUARKUS_PID
 sleep 3
 
 podman run -d --rm --name quarkus-banking \
+  --memory 256m --cpus 1 \
   -p 8080:8080 \
   -e QUARKUS_DATASOURCE_JDBC_URL=jdbc:postgresql://host.containers.internal:5432/banking \
   quarkus-banking:latest
@@ -233,6 +242,7 @@ podman images | grep "banking"
 ```bash
 podman stop quarkus-banking 2>/dev/null || true
 podman run -d --rm --name spring-banking \
+  --memory 256m --cpus 1 \
   -p 8080:8080 \
   -e SPRING_DATASOURCE_URL=jdbc:postgresql://host.containers.internal:5432/banking \
   spring-banking:latest
@@ -245,6 +255,7 @@ podman stats --no-stream spring-banking
 ```bash
 podman stop spring-banking
 podman run -d --rm --name quarkus-banking \
+  --memory 256m --cpus 1 \
   -p 8080:8080 \
   -e QUARKUS_DATASOURCE_JDBC_URL=jdbc:postgresql://host.containers.internal:5432/banking \
   quarkus-banking:latest
@@ -265,6 +276,7 @@ sudo dnf install httpd-tools -y
 ##### 4.4.2.1 Create test account
 ```bash
 podman run -d --rm --name spring-banking \
+  --memory 256m --cpus 1 \
   -p 8080:8080 \
   -e SPRING_DATASOURCE_URL=jdbc:postgresql://host.containers.internal:5432/banking \
   spring-banking:latest
@@ -281,7 +293,7 @@ podman stats --no-stream spring-banking
 
 ##### 4.4.2.3 Run load test
 ```bash
-ab -n 5000 -c 50 http://localhost:8080/accounts/2/balance
+ab -n 20000 -c 50 http://localhost:8080/accounts/2/balance
 ```
 
 ##### 4.4.2.4 Memory snapshot (after load)
@@ -299,6 +311,7 @@ podman stop spring-banking
 ##### 4.4.3.1 Create test account
 ```bash
 podman run -d --rm --name quarkus-banking \
+  --memory 256m --cpus 1 \
   -p 8080:8080 \
   -e QUARKUS_DATASOURCE_JDBC_URL=jdbc:postgresql://host.containers.internal:5432/banking \
   quarkus-banking:latest
@@ -315,7 +328,7 @@ podman stats --no-stream quarkus-banking
 
 ##### 4.4.3.3 Run load test
 ```bash
-ab -n 5000 -c 50 http://localhost:8080/accounts/1/balance
+ab -n 20000 -c 50 http://localhost:8080/accounts/1/balance
 ```
 
 ##### 4.4.3.4 Memory snapshot (after load)
@@ -340,6 +353,18 @@ Review the Apache Bench outputs from both tests:
 - **CPU usage**: Processing efficiency
 
 Both frameworks should show similar throughput with Quarkus typically having slightly lower memory consumption under load.
+
+**Resource Constraints Impact:**
+
+Containers run with realistic cloud-native limits (256MB RAM, 1 CPU core) to simulate production environments where resources are controlled via quotas and limit ranges.
+
+Under these constraints, Quarkus demonstrates significant advantages:
+- **Higher throughput** (~42% more requests/second)
+- **Lower latency** (~30% faster response times)
+- **Better memory efficiency** (24% less RAM usage)
+- **Lower CPU utilization** (15% less CPU consumption)
+
+This validates Quarkus's optimization for containerized, resource-constrained environments typical of Kubernetes deployments where every MB and CPU cycle directly impacts costs and density.
 
 ## 5. Cleanup
 
@@ -378,15 +403,22 @@ Native mode provides extreme optimization for serverless and edge deployments.
 
 ### Results Summary (from this demo)
 
+**JVM Process (idle, post-GC):**
 | Metric | Spring Boot | Quarkus JVM | Improvement |
 |--------|-------------|-------------|-------------|
-| Startup Time | 2.874s | 1.575s | **1.8x faster** |
-| Container Memory | 433.5 MB | 308.5 MB | **28.8% less** |
-| Container CPU | 136.27% | 75.78% | **44.4% less** |
-| Image Size | 446 MB | 484 MB | 8.5% larger |
-| Throughput | 4597 req/s | 4782 req/s | **4% faster** |
-| Latency (mean) | 10.876 ms | 10.455 ms | **4% lower** |
+| Startup Time | 2.5s | 1.6s | **1.6x faster** |
+| RSS Memory | 281 MB | 238 MB | **15.4% less** |
+| Heap Used | 22 MB | 14 MB | **36.1% less** |
+| Image Size | 431 MB | 427 MB | **1% less** |
+
+**Container (256MB RAM, 1 CPU limit, under load):**
+| Metric | Spring Boot | Quarkus JVM | Improvement |
+|--------|-------------|-------------|-------------|
+| Memory Usage | 212 MB | 160 MB | **24.1% less** |
+| CPU Usage | 70.8% | 59.8% | **15.5% less** |
+| Throughput | 768 req/s | 1092 req/s | **42.1% faster** |
+| Latency (mean) | 65 ms | 46 ms | **29.6% lower** |
 | **Code Changes** | - | **None** | Same Spring APIs |
 
-**Key insight**: Quarkus provides significant resource efficiency improvements while maintaining 100% Spring API compatibility. Ideal for cloud-native and containerized deployments where memory and CPU directly impact costs.
+**Key insight**: Quarkus delivers substantial performance gains under realistic resource constraints (256MB RAM, 1 CPU) typical of production Kubernetes environments. With zero code changes to Spring APIs, applications gain 42% more throughput while consuming 24% less memory—directly reducing cloud costs and increasing deployment density.
 
