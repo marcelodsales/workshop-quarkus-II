@@ -2,7 +2,7 @@
 
 ## Running the Ansible playbooks
 
-From the project root (`/home/masales/RedHat/Workshops/Quarkus_II`), use:
+From the project root, use:
 
 - **Quarkus 01 – developer joy (English)**  
   `ansible-playbook playbook-01.yaml`
@@ -20,4 +20,3 @@ Requirements:
 - Ansible installed and available in `PATH`.
 - Podman and podman-compose available for local database/containers.
 - For OpenShift/Knative steps: `oc` logged into a cluster with the required operators installed.
-
