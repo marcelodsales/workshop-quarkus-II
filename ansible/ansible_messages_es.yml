@@ -1,0 +1,292 @@
+messages:
+  step: "Paso"
+  start: "INICIO"
+  end: "FIN"
+  continue: "Presione Enter para continuar o Ctrl+C para Cancelar"
+
+  # 01 - developer joy
+  step01_dev_services:
+    title: "Dev Services con 01-developer-joy"
+    prompt: |
+      Objetivo: iniciar la aplicación 01-developer-joy en modo dev y mostrar Dev Services en la Dev UI.
+
+      Comandos:
+        cd quarkus-examples/01-developer-joy
+        ./mvnw quarkus:dev
+
+      Notas:
+        - Abrir en el navegador:
+            http://localhost:8080/q/dev-ui/dev-services
+
+      Puntos para comentar:
+      - Dev Services inicia automáticamente la infraestructura de desarrollo (bases de datos, Keycloak, etc.).
+      - Reduce la configuración local y acelera la incorporación de nuevos desarrolladores.
+      - En la Dev UI puedes ver qué Dev Services están activos y sus datos de conexión.
+
+  step02_extensions_hql_console:
+    title: "Extensiones y HQL Console con 01-developer-joy"
+    prompt: |
+      Objetivo: mostrar las extensiones instaladas y usar la HQL Console con 01-developer-joy.
+
+      Comandos:
+
+      Notas:
+        - Abrir en el navegador:
+            Dev UI (lista de extensiones): http://localhost:8080/q/dev-ui
+            HQL Console:                  http://localhost:8080/q/dev-ui/quarkus-hibernate-orm/hql-console
+        - Consulta de ejemplo:
+            select a from Account a
+
+      Puntos para comentar:
+      - Las extensiones son la forma de añadir capacidades a Quarkus (JPA, REST, OIDC, observabilidad, etc.).
+      - La Dev UI permite inspeccionar qué extensiones están presentes y sus herramientas asociadas.
+      - La HQL Console permite consultar la base de datos directamente desde el navegador.
+      - Esto es útil para depurar y explorar el modelo de datos sin escribir código adicional.
+
+  step03_continuous_testing:
+    title: "Continuous Testing con 01-developer-joy"
+    prompt: |
+      Objetivo: demostrar Continuous Testing de Quarkus con 01-developer-joy.
+
+      Comandos:
+
+      Notas:
+        - Abrir en el navegador:
+            Continuous Testing: http://localhost:8080/q/dev-ui/continuous-testing
+        - Atajo en la consola: en la terminal donde corre Quarkus en modo dev, presionar 'r' para ejecutar los tests.
+        - Acción de demo: hacer un pequeño cambio seguro en el código y mostrar que los tests se re-ejecutan automáticamente.
+
+      Puntos para comentar:
+      - Los tests se vuelven a ejecutar automáticamente en cada cambio de código en modo dev.
+      - Un ciclo de feedback más rápido permite refactorizar con mayor seguridad y confianza.
+
+  step04_jfr:
+    title: "Extensión JFR con 01-developer-joy"
+    prompt: |
+      Objetivo: grabar e inspeccionar una sesión de Java Flight Recorder (JFR) para la aplicación Quarkus.
+
+      Comandos:
+        jcmd | grep quarkus
+        jcmd <ProcessID> JFR.start name=banking-demo settings=profile filename=quarkus-recording.jfr
+        jcmd <ProcessID> JFR.stop name=banking-demo
+        jfr summary quarkus-recording.jfr
+        jfr print --categories quarkus quarkus-recording.jfr
+        jmc -open quarkus-recording.jfr
+
+      Notas:
+
+      Puntos para comentar:
+      - JFR es un profiler nativo embebido en la JVM, con bajo overhead.
+      - La demo incluye un evento JFR personalizado com.redhat.monitoring.DataAccessEvent para medir operaciones de base de datos.
+      - Las grabaciones se pueden analizar tanto por CLI como con Java Mission Control.
+
+  step05_observability_stack:
+    title: "Observability Stack con 01-developer-joy"
+    prompt: |
+      Objetivo: mostrar los principales endpoints de observabilidad expuestos por la aplicación 01-developer-joy.
+
+      Comandos:
+
+      Notas:
+        - Abrir en el navegador:
+            Dev UI:  http://localhost:8080/q/dev-ui
+            LGTM:    abrir la extensión LGTM para acceder a Grafana y componentes relacionados
+            Health:  http://localhost:8080/q/health
+            Metrics: http://localhost:8080/q/metrics
+
+      Puntos para comentar:
+      - Los endpoints de health y metrics están disponibles de forma predeterminada para Kubernetes/OpenShift.
+      - La extensión LGTM agrega enlaces a Grafana y otros componentes de observabilidad.
+
+  step06_keycloak_oidc:
+    title: "Integración Keycloak OIDC con 01-developer-joy"
+    prompt: |
+      Objetivo: mostrar la integración de Keycloak con Quarkus OIDC usando 01-developer-joy.
+
+      Comandos:
+
+      Notas:
+        - Abrir en el navegador:
+            OIDC Dev UI: http://localhost:8080/q/dev-ui/quarkus-oidc/keycloak-provider
+            Keycloak:    http://localhost:7171
+        - Credenciales: admin / admin
+        - En la OIDC Dev UI, habilitar los logs al final de la página para ver peticiones y tokens.
+        - Abrir el YAML de configuración de la aplicación y mostrar realm, clientes, usuarios y roles.
+        - En el código de 01-developer-joy, abrir com.redhat.rest.ProtectedBankingRestResource y resaltar los endpoints anotados con @RolesAllowed.
+
+      Puntos para comentar:
+      - Dev Services inicia automáticamente una instancia de Keycloak para desarrollo local.
+      - La configuración OIDC vive en el YAML de la aplicación (realm, clientes, usuarios, roles).
+      - El cliente OIDC de Quarkus renueva tokens automáticamente, reduciendo código repetitivo.
+
+  # 02 - cloud native
+  step01_profiles:
+    title: "Perfiles de Quarkus con 02-cloud-native"
+    prompt: |
+      Objetivo: ejecutar la aplicación 02-cloud-native e introducir los perfiles de Quarkus.
+
+      Comandos:
+        cd quarkus-examples/02-cloud-native
+        ./mvnw quarkus:dev
+
+      Notas:
+        - Abrir quarkus-examples/02-cloud-native/src/main/resources/application.yml y mostrar las secciones de perfiles.
+        - Los perfiles mantienen configuraciones separadas por entorno (URLs, credenciales, límites de recursos) en la misma base de código.
+        - En entornos cloud-native, la misma imagen de contenedor puede usarse en dev, test y prod cambiando de perfil, sin cambiar el código.
+
+      Puntos para comentar:
+        - Los perfiles permiten configuraciones diferentes para dev, test, prod y entornos personalizados.
+        - Se puede seleccionar un perfil con -Dquarkus.profile al ejecutar la aplicación.
+
+  step02_hibernate_offline:
+    title: "Hibernate Offline con 02-cloud-native"
+    prompt: |
+      Objetivo: explicar el modo offline de Hibernate y la gestión de esquema usando 02-cloud-native.
+
+      Comandos:
+
+      Notas:
+        - En application.yml, observar: quarkus.hibernate-orm.database.start-offline: true
+        - En application.yml, observar: quarkus.hibernate-orm.schema-management.strategy: none
+        - En el perfil %test, observar schema-management: drop-and-create
+        - Con la aplicación en modo dev y Postgres detenido, llamar a http://localhost:8080/api/accounts y observar que falla mientras la aplicación sigue levantada.
+        - Luego iniciar la base de datos:
+            cd quarkus-examples/02-cloud-native
+            podman-compose up
+        - Volver a llamar a http://localhost:8080/api/accounts y observar que, con la base disponible, la aplicación funciona sin reiniciar.
+
+      Puntos para comentar:
+        - El modo offline permite que Hibernate arranque sin conexión activa a la base de datos.
+        - En entornos cloud-native, el esquema suele ser gestionado externamente (migraciones/DBA), no por la aplicación en tiempo de ejecución.
+
+  step03_external_configuration:
+    title: "Configuración externa con 02-cloud-native"
+    prompt: |
+      Objetivo: mostrar cómo 02-cloud-native usa ConfigMaps, Secrets y Volumes para configuración externa.
+
+      Comandos:
+
+      Notas:
+        - En openshift/banking-configmap.yaml, observar las claves BANKING_TITLE y DATA_LOAD_EXAMPLE.
+        - En openshift/postgres.yaml, observar el secret postgresql-secret con las claves database-*.
+        - En application.yml, observar quarkus.openshift.env.configmaps: banking-config y env.secrets: postgresql-secret.
+        - En application.yml, observar pvc-volumes.large-files y mounts.large-files mapeados a /app/data.
+        - En large-files-pvc.yaml y pod-large-files.yaml, observar cómo el PVC large-files-data se monta para archivos de datos grandes.
+
+      Puntos para comentar:
+        - Los ConfigMaps almacenan configuración no sensible (títulos, rutas de archivos, parámetros de ajuste) fuera de la imagen de la aplicación.
+        - Los Secrets almacenan credenciales y datos sensibles de conexión a base de datos.
+        - Los Volumes manejan archivos grandes de forma eficiente y evitan enviar payloads enormes vía variables de entorno o ConfigMaps.
+        - La configuración externa permite reutilizar la misma imagen en distintos entornos y cambiar el comportamiento desde la plataforma.
+
+  step04_jakarta_data:
+    title: "Jakarta Data con 02-cloud-native"
+    prompt: |
+      Objetivo: mostrar cómo se usan los repositorios de Jakarta Data en la aplicación 02-cloud-native.
+
+      Comandos:
+
+      Notas:
+        - En com.redhat.repository.AccountRepository, observar el uso de CrudRepository y @Query.
+        - En com.redhat.repository.TransactionRepository, observar el método de consulta personalizado findByAccountNumber.
+        - En com.redhat.service.BankingServiceBase, observar cómo se inyectan y usan AccountRepository y TransactionRepository.
+
+      Puntos para comentar:
+        - Los repositorios de Jakarta Data proveen operaciones CRUD y de consulta sin código DAO repetitivo.
+        - Las consultas se definen de forma declarativa con @Query y parámetros, mapeadas directamente al modelo de dominio.
+
+  step05_native_compilation:
+    title: "Compilación nativa con 02-cloud-native"
+    prompt: |
+      Objetivo: compilar y ejecutar un ejecutable nativo para la aplicación 02-cloud-native.
+
+      Comandos:
+        cd quarkus-examples/02-cloud-native
+        ./mvnw package -Dnative
+        ./mvnw package -Dnative -Dquarkus.native.container-build=true
+
+      Notas:
+        - El primer comando genera un ejecutable nativo usando la instalación local de GraalVM.
+        - El segundo comando genera el ejecutable nativo dentro de un contenedor, útil cuando GraalVM no está instalado localmente.
+        - En quarkus-examples/02-cloud-native/src/main/docker/Dockerfile.native-micro, observar cómo se usa una imagen base micro para ejecutables nativos de Quarkus y así reducir el tamaño de la imagen.
+
+      Puntos para comentar:
+        - Los ejecutables nativos arrancan más rápido y usan menos memoria que el modo JVM.
+        - Las imágenes nativas encajan bien en entornos serverless y de alta densidad de contenedores.
+
+  step06_openshift_deploy:
+    title: "Despliegue en OpenShift con 02-cloud-native"
+    prompt: |
+      Objetivo: generar una imagen nativa y desplegar la aplicación 02-cloud-native en OpenShift.
+
+      Comandos:
+        cd quarkus-examples/02-cloud-native
+        ./mvnw clean package -DskipTests -Pnative -Dquarkus.openshift.deploy=true
+
+      Notas:
+        - Antes de desplegar, detener la instancia local en modo dev (Ctrl+C en la terminal que ejecuta ./mvnw quarkus:dev).
+        - Este comando construye un ejecutable nativo y usa la extensión de OpenShift para generar y aplicar los recursos en el clúster.
+        - Los manifiestos generados se encuentran en target/kubernetes/openshift.yml.
+        - Asegurarse de estar autenticado en OpenShift y utilizando el proyecto correcto antes de ejecutar el comando de despliegue.
+
+      Puntos para comentar:
+        - La integración de Quarkus con OpenShift automatiza la generación de manifiestos y el despliegue directamente desde el build.
+        - Combinar imágenes nativas con despliegue en OpenShift reduce el tiempo de arranque y el consumo de recursos en el clúster.
+
+  step07_liveness_readiness:
+    title: "Liveness y Readiness con 02-cloud-native"
+    prompt: |
+      Objetivo: mostrar cómo 02-cloud-native expone endpoints de liveness y readiness para Kubernetes/OpenShift.
+
+      Comandos:
+
+      Notas:
+        - En quarkus-examples/02-cloud-native/pom.xml, observar la dependencia quarkus-smallrye-health.
+        - Con la aplicación ejecutándose en OpenShift, observar los endpoints de health expuestos por el servicio:
+            /q/health
+            /q/health/live
+            /q/health/ready
+        - Usar la consola de OpenShift o comandos oc para ver cómo estos endpoints se conectan con los probes de liveness y readiness.
+
+      Puntos para comentar:
+        - Los probes de liveness responden "¿el proceso sigue vivo?", los de readiness responden "¿la app está lista para recibir tráfico?".
+        - Estos endpoints de health están diseñados para integrarse directamente con los health checks de Kubernetes/OpenShift sin código adicional.
+
+  step08_reactive:
+    title: "Reactivo con 02-cloud-native"
+    prompt: |
+      Objetivo: demostrar el endpoint reactivo que hace streaming de datos grandes en 02-cloud-native.
+
+      Comandos:
+
+      Notas:
+        - Con la app desplegada en OpenShift y el volumen de large-files configurado, primero llamar al endpoint tradicional:
+            https://<route-host>/api/data/read-traditional
+        - Luego llamar al endpoint reactivo:
+            https://<route-host>/api/data/read-reactive
+        - Observar que el endpoint tradicional lee el archivo completo en memoria antes de responder, mientras que el endpoint reactivo hace streaming incremental de cuentas y transacciones.
+
+      Puntos para comentar:
+        - El endpoint reactivo usa Multi<DataItem> para hacer streaming desde archivos JSON grandes sin bloquear el event loop.
+        - El streaming reactivo mejora el uso de memoria y la capacidad de respuesta cuando se manejan payloads grandes.
+
+  step09_knative:
+    title: "Knative y Serverless con 02-cloud-native"
+    prompt: |
+      Objetivo: explicar cómo la aplicación 02-cloud-native puede ejecutarse como un servicio serverless de Knative.
+
+      Comandos:
+        oc apply -f quarkus-examples/02-cloud-native/openshift/banking-serverless.yaml
+
+      Notas:
+        - En quarkus-examples/02-cloud-native/openshift/banking-serverless.yaml, observar la definición de Knative Service (kind: Service, apiVersion: serving.knative.dev/v1).
+        - Observar cómo se configuran la imagen, los envFrom (ConfigMap y Secret) y los volumeMounts (PVC large-files) para el despliegue serverless.
+        - Observar las anotaciones de autoscaling de Knative (min-scale, scale-to-zero-grace-period, window) que controlan el scale-to-zero y el comportamiento de escalado.
+
+      Puntos para comentar:
+        - Knative ejecuta la app Quarkus como un servicio serverless, escalando a cero cuando no hay tráfico y volviendo a escalar cuando llegan peticiones.
+        - Una aplicación de estilo REST puede convertirse fácilmente en un workload serverless reutilizando la misma imagen de contenedor detrás de un Knative Service.
+        - En un entorno serverless, al actualizar un ConfigMap, los nuevos pods arrancan con la configuración actualizada sin reconstruir la imagen.
+        - Combinar imágenes nativas, endpoints de health y configuración externa hace que la app encaje muy bien en plataformas serverless.
+
+

@@ -1,0 +1,37 @@
+---
+- name: Quarkus Cloud Native Workshop (02)
+  hosts: localhost
+  gather_facts: false
+  vars:
+    user_language: "en"
+
+  tasks:
+    - name: Include messages
+      ansible.builtin.include_vars:
+        file: ansible/ansible_messages_{{ user_language }}.yml
+
+    - name: Preparation
+      ansible.builtin.include_tasks:
+        file: ansible/playbook-preparation.yaml
+
+    - name: Prompt Template for 02
+      ansible.builtin.include_tasks: ansible/prompt_template.yml
+      loop:
+        - step01_profiles
+        - step02_hibernate_offline
+        - step03_external_configuration
+        - step04_jakarta_data
+        - step05_native_compilation
+        - step06_openshift_deploy
+        - step07_liveness_readiness
+        - step08_reactive
+        - step09_knative
+      loop_control:
+        loop_var: current_step
+        index_var: step_index
+      vars:
+        message_title: "{{ messages[current_step].title }}"
+        message_prompt: "{{ messages[current_step].prompt }}"
+        step_number: "{{ step_index + 1 }}"
+
+

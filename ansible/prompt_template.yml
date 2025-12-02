@@ -1,0 +1,18 @@
+---
+- name: "{{ messages.step }} {{ step_number }} - {{ message_title }}"
+  ansible.builtin.pause:
+    prompt: |
+
+      ==================== {{ messages.step }} {{ step_number }} - {{ messages.start }} ======================
+
+      {{ message_prompt }}
+
+      ==================== {{ messages.step }} {{ step_number }} - {{ messages.end }} ======================
+
+
+
+
+      {{ messages.continue }}
+    echo: false
+
+

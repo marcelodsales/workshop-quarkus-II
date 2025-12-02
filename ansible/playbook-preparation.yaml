@@ -1,0 +1,26 @@
+---
+- name: 🔍 Checking if Java is installed...
+  ansible.builtin.command: java -version
+  register: java_version
+  ignore_errors: true
+
+- name: ❌ Fail if Java is not installed
+  ansible.builtin.fail:
+    msg: "Java is not installed or not working. Please install it before proceeding."
+  when: java_version.rc != 0
+
+- name: 🔍 Checking if Maven is installed...
+  ansible.builtin.command: mvn -version
+  register: mvn_version
+  ignore_errors: true
+
+- name: ❌ Fail if Maven is not installed
+  ansible.builtin.fail:
+    msg: "Maven is not installed or not working. Please install it before proceeding."
+  when: mvn_version.rc != 0
+
+- name: ✅ Environment is ready for the Quarkus workshop
+  ansible.builtin.debug:
+    msg: "Java and Maven are correctly installed. We can proceed with the workshop!"
+
+

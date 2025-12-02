@@ -1,0 +1,35 @@
+---
+- name: Quarkus Developer Joy Workshop (01)
+  hosts: localhost
+  gather_facts: false
+  vars:
+    user_language: "en"
+
+  tasks:
+    - name: Include messages
+      ansible.builtin.include_vars:
+        file: ansible/ansible_messages_{{ user_language }}.yml
+
+    - name: Preparation
+      ansible.builtin.include_tasks:
+        file: ansible/playbook-preparation.yaml
+
+    - name: Prompt Template for 01
+      ansible.builtin.include_tasks: ansible/prompt_template.yml
+      loop:
+        - step01_dev_services
+        - step02_extensions_hql_console
+        - step03_continuous_testing
+        - step04_jfr
+        - step05_observability_stack
+        - step06_keycloak_oidc
+        - step07_stop_01
+      loop_control:
+        loop_var: current_step
+        index_var: step_index
+      vars:
+        message_title: "{{ messages[current_step].title }}"
+        message_prompt: "{{ messages[current_step].prompt }}"
+        step_number: "{{ step_index + 1 }}"
+
+
